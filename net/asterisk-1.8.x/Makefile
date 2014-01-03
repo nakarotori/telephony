@@ -290,10 +290,10 @@ endif
 
 ifneq ($(SDK)$(CONFIG_PACKAGE_asterisk18-curl),)
   CONFIGURE_ARGS+= \
-	--with-curl="$(STAGING_DIR)/usr"
+	--with-libcurl="$(STAGING_DIR)/usr"
 else
   CONFIGURE_ARGS+= \
-	--without-curl
+	--without-libcurl
 endif
 
 ifneq ($(SDK)$(CONFIG_PACKAGE_asterisk18-pgsql),)
