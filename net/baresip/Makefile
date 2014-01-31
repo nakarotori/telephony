@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2010-2013 OpenWrt.org
+# Copyright (C) 2010-2014 OpenWrt.org
 # Copyright (C) 2010 Alfred E. Heggestad
 #
 # This is free software, licensed under the GNU General Public License v2.
@@ -9,12 +9,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=baresip
-PKG_VERSION:=0.4.6
-PKG_RELEASE:=1
+PKG_VERSION:=0.4.10
+PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://www.creytiv.com/pub/
-PKG_MD5SUM:=862aac3a9840cc283d484cbc39df7059
+PKG_MD5SUM:=e73b91a3bca4aa11a19b6967b030a458
 
 baresip-mods:= \
 	alsa \
@@ -95,9 +95,7 @@ define Package/baresip/install
 	$(CP) $(PKG_INSTALL_DIR)/usr/bin/baresip $(1)/usr/bin/
 	$(INSTALL_DIR) $(1)/usr/lib/baresip/modules
 	$(CP) \
-		$(PKG_INSTALL_DIR)/usr/lib/baresip/modules/ice.so \
-		$(PKG_INSTALL_DIR)/usr/lib/baresip/modules/stun.so \
-		$(PKG_INSTALL_DIR)/usr/lib/baresip/modules/turn.so \
+		$(PKG_INSTALL_DIR)/usr/lib/baresip/modules/{account,contact,ice,menu,stun,turn}.so \
 		$(1)/usr/lib/baresip/modules/.
 	$(INSTALL_DIR) $(1)/usr/share/baresip
 	$(CP) $(PKG_INSTALL_DIR)/usr/share/baresip/* $(1)/usr/share/baresip/.
