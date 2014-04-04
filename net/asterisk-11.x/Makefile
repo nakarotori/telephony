@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=asterisk11
-PKG_VERSION:=11.7.0
-PKG_RELEASE:=4
+PKG_VERSION:=11.8.1
+PKG_RELEASE:=1
 
 PKG_SOURCE:=asterisk-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://downloads.asterisk.org/pub/telephony/asterisk/releases/
-PKG_MD5SUM:=f0c6b577f1efd8dc2de1f259b95a8d66
+PKG_MD5SUM:=7bace8e6845188ca68b8d682d71cb1cc
 
 PKG_BUILD_DIR=$(BUILD_DIR)/asterisk-$(PKG_VERSION)
 
@@ -107,17 +107,19 @@ define Package/asterisk11/conffiles
 /etc/asterisk/indications.conf
 /etc/asterisk/logger.conf
 /etc/asterisk/manager.conf
+/etc/asterisk/modules.conf
 /etc/asterisk/rtp.conf
 /etc/asterisk/sip.conf
 /etc/asterisk/sip_notify.conf
 /etc/asterisk/udptl.conf
+/etc/asterisk/users.conf
 /etc/default/asterisk
 /etc/init.d/asterisk
 endef
 
 AST_CFG_FILES:= \
 	asterisk.conf acl.conf ccss.conf extconfig.conf extensions.conf features.conf indications.conf logger.conf manager.conf modules.conf \
-	rtp.conf sip_notify.conf sip.conf udptl.conf
+	rtp.conf sip_notify.conf sip.conf udptl.conf users.conf
 AST_EMB_MODULES:=\
 	app_dial app_echo app_macro app_playback codec_ulaw format_pcm func_callerid \
 	func_logic func_strings func_timeout chan_sip chan_local pbx_config res_crypto res_http_websocket res_rtp_asterisk res_rtp_multicast
@@ -320,7 +322,7 @@ $(eval $(call BuildPackage,asterisk11-sounds))
 
 $(eval $(call BuildAsteriskModule,app-alarmreceiver,Alarm receiver,Central Station Alarm receiver for Ademco Contact ID,,,,app_alarmreceiver,))
 $(eval $(call BuildAsteriskModule,app-authenticate,Authenticate commands,Execute arbitrary authenticate commands,,,,app_authenticate,))
-$(eval $(call BuildAsteriskModule,app-confbridge,ConfBridge,Software bridge for multi-party audio conferencing,,/etc/asterisk/confbridge.conf,confbridge.conf,app_confbridge bridge_builtin_features bridge_multiplexed bridge_simple bridge_softmix,))
+$(eval $(call BuildAsteriskModule,app-confbridge,ConfBridge,Software bridge for multi-party audio conferencing,,/etc/asterisk/confbridge.conf,confbridge.conf,app_confbridge bridge_builtin_features bridge_multiplexed bridge_simple bridge_softmix chan_bridge,))
 $(eval $(call BuildAsteriskModule,app-directed_pickup,Directed call pickup,support for directed call pickup,,,,app_directed_pickup,))
 $(eval $(call BuildAsteriskModule,app-disa,Direct Inward System Access,Direct Inward System Access,,,,app_disa,))
 $(eval $(call BuildAsteriskModule,app-exec,Exec application,support for application execution,,,,app_exec,))
