@@ -16,6 +16,7 @@ PKG_SOURCE_URL:=http://b2bua.org/chrome/site/
 PKG_MD5SUM:=b0b5d6cdce3f17cdbbac473c11a2d0e5
 
 PKG_INSTALL:=1
+PKG_CHECK_FORMAT_SECURITY:=0
 
 include $(INCLUDE_DIR)/package.mk
 
