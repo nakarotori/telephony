@@ -19,6 +19,7 @@ PKG_MD5SUM:=fd1793712ce3d484e5bff4ea85641e43
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)-$(PKG_VARIANT)
 
 PKG_BUILD_DEPENDS:=curl expat libxml2 mysql openldap openssl pcre postgresql radiusclient-ng
+PKG_CHECK_FORMAT_SECURITY:=0
 
 include $(INCLUDE_DIR)/package.mk
 
