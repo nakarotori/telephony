@@ -8,16 +8,15 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=asterisk11
-PKG_VERSION:=11.10.2
-PKG_RELEASE:=1
+PKG_VERSION:=11.11.0
+PKG_RELEASE:=2
 
 PKG_SOURCE:=asterisk-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://downloads.asterisk.org/pub/telephony/asterisk/releases/
-PKG_MD5SUM:=142691ceabdf4cd378a9725419215bd2
+PKG_MD5SUM:=2983e6ebf2892bdefd41a597873f433a
 
 PKG_BUILD_DIR=$(BUILD_DIR)/asterisk-$(PKG_VERSION)
 
-include $(INCLUDE_DIR)/ltqtapi.mk
 include $(INCLUDE_DIR)/package.mk
 
 define Package/asterisk11/install/module
@@ -65,6 +64,7 @@ This package provides support $(3) in Asterisk.
 $(foreach c,$(6),$(call Package/asterisk11/install/conffile,$$(1),$(c));)
 $(foreach m,$(7),$(call Package/asterisk11/install/module,$$(1),$(m));)
 $(foreach s,$(8),$(call Package/asterisk11/install/sounds,$$(1),$(s));)
+$(foreach b,$(9),$(call Package/asterisk11/install/sbin,$$(1),$(b));)
   endef
 
   $$(eval $$(call BuildPackage,asterisk11-$(1)))
@@ -173,7 +173,7 @@ endif
 
 ifneq ($(SDK)$(CONFIG_PACKAGE_asterisk11-mysql),)
   CONFIGURE_ARGS+= \
-	--with-mysqlclient="$(STAGING_DIR)/usr/bin"
+	--with-mysqlclient
 else
   CONFIGURE_ARGS+= \
 	--without-mysqlclient
@@ -318,6 +318,7 @@ $(eval $(call BuildPackage,asterisk11-sounds))
 # 6 - conf files
 # 7 - module files
 # 8 - sound files
+# 9 - binary files
 ################################
 
 $(eval $(call BuildAsteriskModule,app-alarmreceiver,Alarm receiver,Central Station Alarm receiver for Ademco Contact ID,,,,app_alarmreceiver,))
@@ -337,7 +338,7 @@ $(eval $(call BuildAsteriskModule,app-readexten,Extension to variable,a trivial 
 $(eval $(call BuildAsteriskModule,app-record,Record sound file,to record a sound file,,,,app_record,))
 $(eval $(call BuildAsteriskModule,app-sayunixtime,Say Unix time,an application to say Unix time,,,,app_sayunixtime,))
 $(eval $(call BuildAsteriskModule,app-senddtmf,Send DTMF digits,Sends arbitrary DTMF digits,,,,app_senddtmf,))
-$(eval $(call BuildAsteriskModule,app-sms,SMS,SMS support (ETSI ES 201 912 protocol 1),,,,app_sms,))
+$(eval $(call BuildAsteriskModule,app-sms,SMS,SMS support (ETSI ES 201 912 protocol 1),+libpopt +libstdcpp,,,app_sms,,smsq))
 $(eval $(call BuildAsteriskModule,app-stack,Stack applications, stack applications Gosub Return etc., +asterisk11-res-agi,,,app_stack,))
 $(eval $(call BuildAsteriskModule,app-system,System exec,support for executing system commands,,,,app_system,))
 $(eval $(call BuildAsteriskModule,app-talkdetect,File playback with audio detect,for file playback with audio detect,,,,app_talkdetect,))

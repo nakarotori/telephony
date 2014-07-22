@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=asterisk18
-PKG_VERSION:=1.8.28.2
-PKG_RELEASE:=1
+PKG_VERSION:=1.8.29.0
+PKG_RELEASE:=2
 
 PKG_SOURCE:=asterisk-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://downloads.asterisk.org/pub/telephony/asterisk/releases/
-PKG_MD5SUM:=c16f288f97ac39042eb8e9bee6766aff
+PKG_MD5SUM:=23778d7ebefdecd4c742d5de39f5e2c1
 
 PKG_BUILD_DIR=$(BUILD_DIR)/asterisk-$(PKG_VERSION)
 
@@ -67,22 +67,10 @@ $(call Package/asterisk18/Default/description)
  This package contains voicemail related modules for Asterisk.
 endef
 
-define Package/asterisk18-app-meetme
-$(call Package/asterisk18/Default)
-  TITLE:=conferencing support
-  DEPENDS:= asterisk18 +dahdi-tools-libtonezone +kmod-dahdi-linux
-endef
-
-define Package/asterisk18-app-meetme/description
-$(call Package/asterisk18/Default/description)
- This package provides the MeetMe application driver Conferencing support to
- Asterisk.
-endef
-
 define Package/asterisk18-chan-iax2
 $(call Package/asterisk18/Default)
   TITLE:=IAX support
-  DEPENDS:= asterisk18 +asterisk18-res-crypto
+  DEPENDS:= asterisk18 +asterisk18-res-crypto +asterisk18-res-timing-timerfd
 endef
 
 define Package/asterisk18-chan-iax2/description
@@ -267,13 +255,16 @@ $(call Package/asterisk18/Default/description)
  This package provides Lua resources for Asterisk.
 endef
 
-ifneq ($(SDK)$(CONFIG_PACKAGE_asterisk18-app-meetme),)
-  CONFIGURE_ARGS+= \
-	--with-dahdi="$(STAGING_DIR)/usr"
-else
-  CONFIGURE_ARGS+= \
-	--without-dahdi
-endif
+define Package/asterisk18-smsq
+$(call Package/asterisk18/Default)
+  TITLE:=SMS application helper
+  DEPENDS:= asterisk18 +libpopt +libstdcpp
+endef
+
+define Package/asterisk18-smsq/description
+$(call Package/asterisk18/Default/description)
+ This package provides support for sending SMS from CLI via Asterisk.
+endef
 
 ifneq ($(SDK)$(CONFIG_PACKAGE_asterisk18-chan-gtalk),)
   CONFIGURE_ARGS+= \
@@ -303,7 +294,7 @@ endif
 
 ifneq ($(SDK)$(CONFIG_PACKAGE_asterisk18-mysql),)
   CONFIGURE_ARGS+= \
-	--with-mysqlclient="$(STAGING_DIR)/usr/bin"
+	--with-mysqlclient
 else
   CONFIGURE_ARGS+= \
 	--without-mysqlclient
@@ -346,6 +337,7 @@ CONFIGURE_ARGS+= \
 	--without-curses \
 	--with-gsm=internal \
 	--without-cap \
+	--without-dahdi \
 	--without-gtk2 \
 	--without-isdnnet \
 	--without-misdn \
@@ -468,20 +460,6 @@ define Package/asterisk18-voicemail/install
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/lib/asterisk/modules/res_smdi.so $(1)/usr/lib/asterisk/modules/
 	$(INSTALL_DIR) $(1)/usr/lib/asterisk/sounds/
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/asterisk/sounds/en/vm-*.gsm $(1)/usr/lib/asterisk/sounds/
-endef
-
-define Package/asterisk18-app-meetme/conffiles
-/etc/asterisk/meetme.conf
-endef
-
-define Package/asterisk18-app-meetme/install
-	$(INSTALL_DIR) $(1)/etc/asterisk
-	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/etc/asterisk/meetme.conf $(1)/etc/asterisk/
-	$(INSTALL_DIR) $(1)/usr/lib/asterisk/modules
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/lib/asterisk/modules/app_meetme.so $(1)/usr/lib/asterisk/modules/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/lib/asterisk/modules/chan_dahdi.so $(1)/usr/lib/asterisk/modules/
-	$(INSTALL_DIR) $(1)/usr/lib/asterisk/sounds/
-	$(CP) $(PKG_INSTALL_DIR)/usr/lib/asterisk/sounds/en/conf-*.gsm $(1)/usr/lib/asterisk/sounds/
 endef
 
 define Package/asterisk18-chan-iax2/conffiles
@@ -671,6 +649,11 @@ define Package/asterisk18-pbx-lua/install
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/lib/asterisk/modules/pbx_lua.so $(1)/usr/lib/asterisk/modules/
 endef
 
+define Package/asterisk18-smsq/install
+	$(INSTALL_DIR) $(1)/usr/sbin/
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/sbin/smsq $(1)/usr/sbin/
+endef
+
 define Buildasterisk18ModuleTemplate
 
   define Package/asterisk18-$(subst _,-,$(1))
@@ -695,7 +678,6 @@ endef
 $(eval $(call BuildPackage,asterisk18))
 $(eval $(call BuildPackage,asterisk18-voicemail))
 $(eval $(call BuildPackage,asterisk18-sounds))
-#$(eval $(call BuildPackage,asterisk18-app-meetme))
 $(eval $(call BuildPackage,asterisk18-chan-iax2))
 $(eval $(call BuildPackage,asterisk18-cdr))
 $(eval $(call BuildPackage,asterisk18-res-musiconhold))
@@ -714,6 +696,7 @@ $(eval $(call BuildPackage,asterisk18-curl))
 $(eval $(call BuildPackage,asterisk18-mysql))
 $(eval $(call BuildPackage,asterisk18-chan-lantiq))
 $(eval $(call BuildPackage,asterisk18-res-srtp))
+$(eval $(call BuildPackage,asterisk18-smsq))
 $(eval $(call Buildasterisk18ModuleTemplate,app_authenticate,Authenticate,support for executing arbitrary authenticate commands))
 $(eval $(call Buildasterisk18ModuleTemplate,app_chanisavail,Channel availability check,support for checking if a channel is available))
 $(eval $(call Buildasterisk18ModuleTemplate,app_chanspy,Channel listen in,support for listening in on any channel))
@@ -724,7 +707,7 @@ $(eval $(call Buildasterisk18ModuleTemplate,app_minivm,Minimal voicemail system,
 $(eval $(call Buildasterisk18ModuleTemplate,app_readexten,Extension to variable,a trivial application to read an extension into a variable))
 $(eval $(call Buildasterisk18ModuleTemplate,app_read,Variable read,a trivial application to read a variable))
 $(eval $(call Buildasterisk18ModuleTemplate,app_sayunixtime,Say Unix time,an application to say Unix time))
-$(eval $(call Buildasterisk18ModuleTemplate,app_sms,SMS,SMS support (ETSI ES 201 912 protocol 1)))
+$(eval $(call Buildasterisk18ModuleTemplate,app_sms,SMS,SMS support (ETSI ES 201 912 protocol 1),+asterisk18-smsq))
 $(eval $(call Buildasterisk18ModuleTemplate,app_stack,Stack applications, stack applications Gosub Return etc., +asterisk18-res-agi))
 $(eval $(call Buildasterisk18ModuleTemplate,app_system,System exec,support for executing system commands))
 $(eval $(call Buildasterisk18ModuleTemplate,app_talkdetect,File playback with audio detect,for file playback with audio detect))
