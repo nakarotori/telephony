@@ -9,16 +9,20 @@
 include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/uclibc++.mk
 
-RELEASEVER:=5.3.0
+RELEASEVER:=5.4.0
 
 PKG_NAME:=yate
 PKG_VERSION:=$(RELEASEVER)-1
-PKG_RELEASE:=1
+PKG_RELEASE:=4
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://yate.null.ro/tarballs/yate5/
-PKG_MD5SUM:=531bfe6189e6d2f7d5e890151dc81d24
+PKG_MD5SUM:=427fd2ffde51116271534f398bf913e8
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
+
+PKG_LICENSE:=GPL-2.0
+PKG_LICENSE_FILES:=COPYING
+PKG_MAINTAINER:=Jiri Slachta <slachta@cesnet.cz>
 
 PKG_INSTALL:=1
 
@@ -34,7 +38,7 @@ endef
 define Package/$(PKG_NAME)
   $(call Package/yate/Default)
   DEPENDS:=+libpthread $(CXX_DEPENDS)
-  TITLE:=Yet Another Telphony Engine
+  TITLE:=Yet Another Telephony Engine
   MENU:=1
 endef
 
@@ -44,26 +48,14 @@ define Package/$(PKG_NAME)/conffiles
 endef
 
 define Package/$(PKG_NAME)/Default/description
-  Is a next-generation telephony engine focused on the VoIP and PSTN.  It does
+  Is a next-generation telephony engine focused on the VoIP and PSTN. It does
   SIP, H.323, IAX, PSTN, and more.
-endef
-
-define Package/$(PKG_NAME)-scripts-php
-  $(call Package/yate/Default)
-  DEPENDS += $(PKG_NAME) $(PKG_NAME)-mod-extmodule +php5 +php5-cli
-  TITLE:= PHP Scripts and script libraries for Yate
 endef
 
 define Package/$(PKG_NAME)-scripts-perl
   $(call Package/yate/Default)
-  DEPENDS += $(PKG_NAME) $(PKG_NAME)-mod-extmodule +microperl
+  DEPENDS += $(PKG_NAME) $(PKG_NAME)-mod-extmodule +perl
   TITLE:= Perl module for Yate
-endef
-
-define Package/$(PKG_NAME)-scripts-python
-  $(call Package/yate/Default)
-  DEPENDS += $(PKG_NAME) $(PKG_NAME)-mod-extmodule +python-mini
-  TITLE:= Python module for Yate
 endef
 
 define Package/$(PKG_NAME)-sounds
@@ -110,7 +102,7 @@ CONFIGURE_ARGS+= \
 	--with-libpq="$(STAGING_DIR)/usr" \
 	--with-mysql="$(STAGING_DIR)/usr" \
 	--without-wphwec \
-	--with-libgsm="$(STAGING_DIR)/usr/include/gsm" \
+	--without-libgsm \
 	--with-libspeex="$(STAGING_DIR)/usr/include" \
 	--without-amrnb \
 	--with-spandsp="$(STAGING_DIR)/usr/include" \
@@ -144,27 +136,9 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_BIN) ./files/yate.init $(1)/etc/init.d/yate
 endef
 
-define Package/$(PKG_NAME)-scripts-php/install
-	$(INSTALL_DIR) $(1)/usr/share/yate/scripts
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/share/yate/scripts/leavemail.php $(1)/usr/share/yate/scripts/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/share/yate/scripts/queue_in.php $(1)/usr/share/yate/scripts/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/share/yate/scripts/queue_out.php $(1)/usr/share/yate/scripts/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/share/yate/scripts/route.php $(1)/usr/share/yate/scripts/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/share/yate/scripts/voicemail.php $(1)/usr/share/yate/scripts/
-	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/usr/share/yate/scripts/libvoicemail.php $(1)/usr/share/yate/scripts/
-	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/usr/share/yate/scripts/libyatechan.php $(1)/usr/share/yate/scripts/
-	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/usr/share/yate/scripts/libyateivr.php $(1)/usr/share/yate/scripts/
-	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/usr/share/yate/scripts/libyate.php $(1)/usr/share/yate/scripts/
-endef
-
 define Package/$(PKG_NAME)-scripts-perl/install
 	$(INSTALL_DIR) $(1)/usr/share/yate/scripts
 	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/usr/share/yate/scripts/Yate.pm $(1)/usr/share/yate/scripts/
-endef
-
-define Package/$(PKG_NAME)-scripts-python/install
-	$(INSTALL_DIR) $(1)/usr/share/yate/scripts
-	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/usr/share/yate/scripts/libyate.py $(1)/usr/share/yate/scripts/
 endef
 
 define Package/$(PKG_NAME)-sounds/install
@@ -217,9 +191,7 @@ endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
 $(eval $(call BuildPackage,$(PKG_NAME)-collection-basic))
-$(eval $(call BuildPackage,$(PKG_NAME)-scripts-php))
 $(eval $(call BuildPackage,$(PKG_NAME)-scripts-perl))
-$(eval $(call BuildPackage,$(PKG_NAME)-scripts-python))
 $(eval $(call BuildPackage,$(PKG_NAME)-sounds))
 $(eval $(call BuildPlugin,accfile,server,SIP or H.323 client (from file),))
 $(eval $(call BuildPlugin,alsachan,client,ALSA Sound Channel,+alsa-lib))
@@ -247,9 +219,7 @@ $(eval $(call BuildPlugin,eventlogs,server,Write events and alarms to log files,
 $(eval $(call BuildPlugin,extmodule,,External Module Handler,))
 $(eval $(call BuildPlugin,faxchan,,Spandsp Fax Channel,+libspandsp))
 $(eval $(call BuildPlugin,filetransfer,,File Transfer Driver,))
-$(eval $(call BuildPlugin,gsmcodec,,GSM Codec,+libgsm))
 $(eval $(call BuildPlugin,gvoice,,Google Voice support,))
-$(eval $(call BuildPlugin,h323chan,,Open H.323 Channel,+libopenh323 @BROKEN)) # libopenh323 doesn't create package or stagin_dir includes or libs
 $(eval $(call BuildPlugin,heartbeat,server,Linux-HA compatible heartbeat,))
 $(eval $(call BuildPlugin,ilbccodec,,iLBC Codec,))
 $(eval $(call BuildPlugin,ilbcwebrtc,,iLBC Codec from the WebRTC project,))
@@ -260,7 +230,6 @@ $(eval $(call BuildPlugin,jabberserver,jabber,Jabber Server,))
 $(eval $(call BuildPlugin,javascript,,Routing using the embedded Javascript language,))
 $(eval $(call BuildPlugin,jbfeatures,jabber,Jabber Server Features,))
 $(eval $(call BuildPlugin,lateroute,server,Last Chance Routing,))
-$(eval $(call BuildPlugin,lksctp,server,SCTP sockets using linux kernel,@BROKEN))
 $(eval $(call BuildPlugin,mgcpca,server,Media Gateway Control Protocol Agent,))
 $(eval $(call BuildPlugin,mgcpgw,server,Media Gateway Control Protocol Gateway,))
 $(eval $(call BuildPlugin,moh,,On Hold (music) Generator,))

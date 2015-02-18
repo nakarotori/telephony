@@ -8,8 +8,8 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=asterisk11-chan-sccp-b
-PKG_REV:=5540
-PKG_VERSION:=v4.2r$(PKG_REV)
+PKG_REV:=5738
+PKG_VERSION:=v4.2-r$(PKG_REV)
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
@@ -20,16 +20,19 @@ PKG_SOURCE_PROTO:=svn
 
 PKG_FIXUP:=autoreconf -fi
 
+PKG_LICENSE:=GPL-1.0
+PKG_LICENSE_FILES:=COPYRIGHT LICENSE
+PKG_MAINTAINER:=Jiri Slachta <slachta@cesnet.cz>
+
 include $(INCLUDE_DIR)/package.mk
 
 define Package/asterisk11-chan-sccp-b
   SUBMENU:=Telephony
   SECTION:=net
   CATEGORY:=Network
-  TITLE:=SCCP channel provider for asterisk
+  TITLE:=SCCP channel provider support
   URL:=http://chan-sccp-b.sourceforge.net/
   DEPENDS:=asterisk11 +libltdl
-  MAINTAINER:=Jiri Slachta <slachta@cesnet.cz>
 endef
 
 define Package/asterisk11-chan-sccp-b/description

@@ -1,5 +1,5 @@
 # 
-# Copyright (C) 2010-2013 OpenWrt.org
+# Copyright (C) 2010-2014 OpenWrt.org
 # Copyright (C) 2010 Alfred E. Heggestad
 #
 # This is free software, licensed under the GNU General Public License v2.
@@ -10,11 +10,15 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=restund
 PKG_VERSION:=0.4.2
-PKG_RELEASE:=1
+PKG_RELEASE:=3
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://www.creytiv.com/pub/
 PKG_MD5SUM:=dd58fc56c29f812fc14988412a3bf14a
+
+PKG_LICENSE:=BSD-3-Clause
+PKG_LICENSE_FILES:=docs/COPYING
+PKG_MAINTAINER:=Jiri Slachta <slachta@cesnet.cz>
 
 restund-mods:= mysql
 
@@ -107,7 +111,6 @@ define BuildPlugin
 
   $$(eval $$(call BuildPackage,restund-mod-$(1)))
 endef
-
 
 $(eval $(call BuildPackage,restund))
 
